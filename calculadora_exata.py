@@ -55,4 +55,7 @@ if __name__ == "__main__":
         print(f"Valor Original: R$ {valor_original:,.2f}")
         print(f"Período considerado: {di.strftime('%m/%Y')} a {df.strftime('%m/%Y')}")
         print(f"Valor Corrigido pelo IPCA: R$ {valor_corrigido:,.2f}")
+        print(f"Valor Corrigido pelo IPCA: R$ {valor_corrigido:,.2f}")
+        
+        
         
