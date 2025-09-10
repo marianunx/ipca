@@ -2,66 +2,60 @@ from bcb import sgs
 import pandas as pd
 
 def calcular_correcao_ipca(valor_original, data_inicial, data_final):
-
     try:
-        # O código da série do IPCA no SGS é 433
+        # Consulta do IPCA (433)
         ipca = sgs.get({'IPCA': 433}, start=data_inicial, end=data_final)
 
         if ipca.empty:
-            print("\nAVISO: Não foram encontrados dados do IPCA para o período selecionado.")
+            print(f"\nNenhum dado IPCA encontrado entre {data_inicial.date()} e {data_final.date()}.")
             return None
 
         fator_acumulado = (1 + ipca['IPCA'] / 100).prod()
         valor_corrigido = valor_original * fator_acumulado
 
-        return valor_corrigido
+        return valor_corrigido, fator_acumulado
 
     except Exception as e:
-        print(f"Ocorreu um erro ao buscar os dados ou calcular a correção: {e}")
-        return None
+        print(f"Erro ao buscar os dados ou calcular a correção: {e}")
+        return None, None
+
 
 def obter_valor():
-    #solicita valores
     while True:
-            valor_input = input("Valor a ser corrigido: ")
-            return float(valor_input)
-
-def obter_data_inicial():
-    """Solicita e valida a data inicial do usuário."""
-    while True:
-        data_input = input("Digite a data INICIAL da cobrança (formato AAAA-MM-DD): ")
+        valor_input = input("Valor a ser corrigido: ")
         try:
-            pd.to_datetime(data_input)
-            return data_input
+            return float(valor_input.replace(",", "."))
         except ValueError:
-            print("Data inválida. Por favor, use o formato AAAA-MM-DD.")
+            print("Valor inválido. Digite um número válido.")
 
-def obter_data_final():
-    """Solicita e valida a data final do usuário."""
+
+def obter_data(mensagem):
     while True:
-        data_input = input("Digite a data FINAL da cobrança (formato AAAA-MM-DD): ")
+        data_input = input(mensagem)
         try:
-            pd.to_datetime(data_input)
-            return data_input
+            return pd.to_datetime(data_input)
         except ValueError:
-            print("Data inválida. Por favor, use o formato AAAA-MM-DD.")
+            print("Data inválida. Use o formato AAAA-MM-DD.")
 
 
 if __name__ == "__main__":
     print("Calculadora de Correção Monetária pelo IPCA")
     print("=" * 40)
 
-    # --- Inserção de dados separada ---
     valor_original = obter_valor()
-    data_inicial_input = obter_data_inicial()
-    data_final_input = obter_data_final()
-    # -----------------------------------
+    data_inicial = obter_data("Digite a data INICIAL da cobrança (AAAA-MM-DD): ")
+    data_final = obter_data("Digite a data FINAL da cobrança (AAAA-MM-DD): ")
+
+    if data_inicial > data_final:
+        print("Erro: a data inicial não pode ser posterior à data final.")
+        exit(1)
 
     print("\nCalculando...")
-    valor_corrigido = calcular_correcao_ipca(valor_original, data_inicial_input, data_final_input)
+    valor_corrigido, fator = calcular_correcao_ipca(valor_original, data_inicial, data_final)
 
     if valor_corrigido is not None:
-        print("\n--- Resultado da Correção ---")
+        print("\n--- Resultado ---")
         print(f"Valor Original: R$ {valor_original:,.2f}")
-        print(f"Período de Correção: de {data_inicial_input} a {data_final_input}")
+        print(f"Período: de {data_inicial.date()} a {data_final.date()}")
+        print(f"Fator acumulado: {fator:.6f}")
         print(f"Valor Corrigido pelo IPCA: R$ {valor_corrigido:,.2f}")
