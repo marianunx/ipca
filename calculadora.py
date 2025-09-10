@@ -3,7 +3,7 @@ import pandas as pd
 
 def calcular_correcao_ipca(valor_original, data_inicial, data_final):
     try:
-        # Consulta do IPCA (433)
+        #codigo ipca
         ipca = sgs.get({'IPCA': 433}, start=data_inicial, end=data_final)
 
         if ipca.empty:
@@ -19,7 +19,6 @@ def calcular_correcao_ipca(valor_original, data_inicial, data_final):
         print(f"Erro ao buscar os dados ou calcular a correção: {e}")
         return None, None
 
-
 def obter_valor():
     while True:
         valor_input = input("Valor a ser corrigido: ")
@@ -27,8 +26,7 @@ def obter_valor():
             return float(valor_input.replace(",", "."))
         except ValueError:
             print("Valor inválido. Digite um número válido.")
-
-
+            
 def obter_data(mensagem):
     while True:
         data_input = input(mensagem)
@@ -37,25 +35,19 @@ def obter_data(mensagem):
         except ValueError:
             print("Data inválida. Use o formato AAAA-MM-DD.")
 
-
 if __name__ == "__main__":
-    print("Calculadora de Correção Monetária pelo IPCA")
+    
+    print("Calculadora IPCA")
     print("=" * 40)
 
     valor_original = obter_valor()
-    data_inicial = obter_data("Digite a data INICIAL da cobrança (AAAA-MM-DD): ")
-    data_final = obter_data("Digite a data FINAL da cobrança (AAAA-MM-DD): ")
+    data_inicial = obter_data("Digite a data inicial da cobrança (AAAA-MM-DD): ")
+    data_final = obter_data("Digite a data final da cobrança (AAAA-MM-DD): ")
 
-    if data_inicial > data_final:
-        print("Erro: a data inicial não pode ser posterior à data final.")
-        exit(1)
-
-    print("\nCalculando...")
     valor_corrigido, fator = calcular_correcao_ipca(valor_original, data_inicial, data_final)
 
     if valor_corrigido is not None:
         print("\n--- Resultado ---")
         print(f"Valor Original: R$ {valor_original:,.2f}")
         print(f"Período: de {data_inicial.date()} a {data_final.date()}")
-        print(f"Fator acumulado: {fator:.6f}")
         print(f"Valor Corrigido pelo IPCA: R$ {valor_corrigido:,.2f}")
