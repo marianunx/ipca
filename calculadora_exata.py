@@ -15,7 +15,7 @@ def calcular_correcao_ipca(valor_original, mes_inicial, ano_inicial, mes_final, 
 
         # verifica se veio vazio
         if ipca.empty:
-            print(f"\nnenhum dado ipca encontrado entre {data_inicial.date()} e {data_final.date()}.")
+            print(f"\nNenhum dado ipca encontrado entre {data_inicial.date()} e {data_final.date()}.")
             return None
 
         # calcula o fator acumulado e o valor corrigido
@@ -25,7 +25,7 @@ def calcular_correcao_ipca(valor_original, mes_inicial, ano_inicial, mes_final, 
         return valor_corrigido, fator_acumulado, data_inicial, data_final
 
     except Exception as e:
-        print(f"erro ao buscar os dados ou calcular a correcao: {e}")
+        print(f"Erro ao buscar os dados ou calcular a correcao: {e}")
         return None
     
 
@@ -39,14 +39,14 @@ def obter_mes_ano(mensagem):
             if 1 <= mes <= 12:
                 return mes, ano
             else:
-                print("mes invalido. digite entre 01 e 12.")
+                print("Mês invalido. digite entre 01 e 12.")
         except:
-            print("formato invalido. use mm/aaaa.")
+            print("Formato invalido. use mm/aaaa.")
 
 
 # programa principal
 if __name__ == "__main__":
-    print("calculadora ipca (10 calculos obrigatorios)")
+    print("Calculadora IPCA (10 calculos obrigatorios)")
     print("=" * 60)
 
     # conecta ao banco de dados
@@ -54,49 +54,49 @@ if __name__ == "__main__":
 
     # faz 10 calculos obrigatorios
     for i in range(1, 11):
-        print(f"\n--- calculo {i} de 10 ---")
-        valor_original = float(input("valor a ser corrigido: ").replace(",", "."))
-        mes_inicial, ano_inicial = obter_mes_ano("digite o mes/ano inicial")
-        mes_final, ano_final = obter_mes_ano("digite o mes/ano final")
+        print(f"\n--- Calculo {i} de 10 ---")
+        valor_original = float(input("Valor a ser corrigido: ").replace(",", "."))
+        mes_inicial, ano_inicial = obter_mes_ano("Digite o mes/ano inicial")
+        mes_final, ano_final = obter_mes_ano("Digite o mes/ano final")
 
         resultado = calcular_correcao_ipca(valor_original, mes_inicial, ano_inicial, mes_final, ano_final)
 
         if resultado:
             valor_corrigido, fator, di, df = resultado
             # mostra o resultado do calculo
-            print("\nresultado:")
-            print(f"valor original: r$ {valor_original:,.2f}")
-            print(f"periodo: {di.strftime('%m/%Y')} a {df.strftime('%m/%Y')}")
-            print(f"fator acumulado: {fator:.8f}")
-            print(f"valor corrigido: r$ {valor_corrigido:,.2f}")
-
+            print("\nResultado:")
+            print(f"Valor original: r$ {valor_original:,.2f}")
+            print(f"Periodo: {di.strftime('%m/%Y')} a {df.strftime('%m/%Y')}")
+            print(f"Fator acumulado: {fator:.8f}")
+            print(f"Valor corrigido: r$ {valor_corrigido:,.2f}")
+        
             # salva no banco
             salvar_calculo(cur, con, valor_original, mes_inicial, ano_inicial, mes_final, ano_final, fator, valor_corrigido)
-            print("[calculo salvo no banco de dados]")
+            print("[Calculo salvo no banco de dados]")
 
     # lista os 10 calculos salvos
-    print("\n=== historico ===")
+    print("\n=== Histórico ===")
     historico = listar_calculos(cur)
     for idx, (id_calc, valor) in enumerate(historico, start=1):
-        print(f"{idx}. valor original: r$ {valor:,.2f}")
+        print(f"{idx}. Valor original: R$ {valor:,.2f}")
 
     # permite consultar um calculo especifico
     while True:
         try:
-            escolha = int(input("\ndigite o numero (1-10) do calculo que deseja consultar: "))
+            escolha = int(input("\nDigite o numero (1-10) do calculo que deseja consultar: "))
             if 1 <= escolha <= 10:
                 id_escolhido = historico[escolha-1][0]
                 dados = consultar_calculo(cur, id_escolhido) 
                 if dados:
-                    print("\n--- consulta detalhada ---")
-                    print(f"id no banco: {dados[0]}")
-                    print(f"valor original: r$ {dados[1]:,.2f}")
-                    print(f"periodo: {dados[2]:02d}/{dados[3]} a {dados[4]:02d}/{dados[5]}")
-                    print(f"fator acumulado: {dados[6]:.8f}")
-                    print(f"valor corrigido: r$ {dados[7]:,.2f}")
-                    print(f"data da consulta: {dados[8]}")
+                    print("\n--- Consulta detalhada ---")
+                    print(f"Id no banco: {dados[0]}")
+                    print(f"Valor original: R$ {dados[1]:,.2f}")
+                    print(f"Periodo: {dados[2]:02d}/{dados[3]} a {dados[4]:02d}/{dados[5]}")
+                    print(f"Fator acumulado: {dados[6]:.8f}")
+                    print(f"Valor corrigido: R$ {dados[7]:,.2f}")
+                    print(f"Data da consulta: {dados[8]}")
                 break
             else:
-                print("escolha invalida, digite de 1 a 10.")
+                print("Escolha invalida, digite de 1 a 10.")
         except ValueError:
-            print("entrada invalida, digite um numero.")
+            print("Entrada invalida, digite um numero.")
